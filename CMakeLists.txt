@@ -18,7 +18,9 @@ add_executable(3D_renderer main.cpp
         common/object.cpp
         common/object.h
         components/graphics.cpp
-        components/graphics.h)
+        components/graphics.h
+        components/world.cpp
+        components/world.h)
 
 find_package(Boost 1.87 REQUIRED)
 target_link_libraries(3D_renderer PRIVATE ${Boost_LIBRARIES})

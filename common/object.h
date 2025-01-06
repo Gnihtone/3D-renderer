@@ -3,15 +3,15 @@
 #include <memory>
 #include <vector>
 
+#include <glm/gtc/quaternion.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
-#include <glm/gtc/quaternion.hpp>
 
 #include "geometry.h"
 
-struct Object {
+class Object {
  public:
-  Object() = default;
+  Object();
   ~Object() = default;
 
   Object(Object&&) = default;
@@ -22,19 +22,19 @@ struct Object {
   void AddChild(const std::shared_ptr<Object>& child);
   void RemoveChild(const std::shared_ptr<Object>& child);
 
-  const glm::vec3& GetPosition() const;
+  [[nodiscard]] const glm::vec3& GetPosition() const;
   void SetPosition(const glm::vec3& position);
 
-  const glm::vec3& GetScale() const;
+  [[nodiscard]] const glm::vec3& GetScale() const;
   void SetScale(const glm::vec3& scale);
 
-  const glm::quat& GetRotation() const;
+  [[nodiscard]] const glm::quat& GetRotation() const;
   void SetRotation(const glm::quat& rotation);
 
-  size_t GetTrianglesCountWithChildren() const;
+  [[nodiscard]] size_t GetTrianglesCountWithChildren() const;
 
-  std::vector<Triangle3D> GetTriangles() const;
-  std::vector<std::shared_ptr<Object>> GetChildren() const;
+  [[nodiscard]] std::vector<Triangle3D> GetTriangles() const;
+  [[nodiscard]] std::vector<std::shared_ptr<Object>> GetChildren() const;
 
  private:
   glm::vec3 position_;

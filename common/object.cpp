@@ -1,12 +1,11 @@
 #include "object.h"
 
-#include <glm/fwd.hpp>
+Object::Object() : position_(glm::vec3{0}), scale_(1), rotation_(1, 0, 0, 0), mesh_triangles_(), children_() {}
 
-Object::Object(const std::vector<Triangle3D>& triangles)
-  : Object(triangles, glm::vec3{0}) {}
+Object::Object(const std::vector<Triangle3D>& triangles) : Object(triangles, glm::vec3{0}) {}
 
-Object::Object(const std::vector<Triangle3D>& triangles, const glm::vec3& position) :
-  position_(position), scale_(1), rotation_(1, 0, 0, 0), mesh_triangles_(triangles), children_() {}
+Object::Object(const std::vector<Triangle3D>& triangles, const glm::vec3& position)
+    : position_(position), scale_(1), rotation_(1, 0, 0, 0), mesh_triangles_(triangles), children_() {}
 
 void Object::AddChild(const std::shared_ptr<Object>& child) {
   children_.push_back(child);

@@ -5,20 +5,66 @@
 #include "components/graphics.h"
 #include "components/visualizer.h"
 
+namespace {
+const std::vector<glm::vec3> cube_vertices = {
+    {-0.5, -0.5, -0.5},  // FRONT-BOTTOM-LEFT
+    {0.5, -0.5, -0.5},   // FRONT-BOTTOM-RIGHT
+    {0.5, 0.5, -0.5},    // FRONT-TOP-RIGHT
+    {-0.5, 0.5, -0.5},   // FRONT-TOP-LEFT
+
+    {-0.5, -0.5, 0.5},  // BACK-BOTTOM-LEFT
+    {0.5, -0.5, 0.5},   // BACK-BOTTOM-RIGHT
+    {0.5, 0.5, 0.5},    // BACK-TOP-RIGHT
+    {-0.5, 0.5, 0.5}    // BACK-TOP-LEFT
+};
+
+const std::vector<Triangle3D> cube_triangles = {
+    // FRONT
+    {.points = {cube_vertices[0], cube_vertices[2], cube_vertices[1]}, .color = Color::RED},
+    {.points = {cube_vertices[0], cube_vertices[2], cube_vertices[3]}, .color = Color::RED},
+
+    // LEFT
+    {.points = {cube_vertices[0], cube_vertices[3], cube_vertices[4]}, .color = Color::BLUE},
+    {.points = {cube_vertices[7], cube_vertices[3], cube_vertices[4]}, .color = Color::BLUE},
+
+    // RIGHT
+    {.points = {cube_vertices[1], cube_vertices[2], cube_vertices[5]}, .color = Color::GREEN},
+    {.points = {cube_vertices[6], cube_vertices[2], cube_vertices[5]}, .color = Color::GREEN},
+
+    // TOP
+    {.points = {cube_vertices[2], cube_vertices[3], cube_vertices[6]}, .color = Color::WHITE},
+    {.points = {cube_vertices[7], cube_vertices[3], cube_vertices[6]}, .color = Color::WHITE},
+
+    // BOTTOM
+    {.points = {cube_vertices[0], cube_vertices[1], cube_vertices[4]}, .color = Color::YELLOW},
+    {.points = {cube_vertices[5], cube_vertices[1], cube_vertices[4]}, .color = Color::YELLOW},
+
+    // BACK
+    {.points = {cube_vertices[4], cube_vertices[5], cube_vertices[6]}, .color = Color::PURPLE},
+    {.points = {cube_vertices[4], cube_vertices[7], cube_vertices[6]}, .color = Color::PURPLE},
+};
+
+}  // namespace
+
 void Application::Run() {
-  Visualizer visualizer;
+  const uint32_t width = 800;
+  const uint32_t height = 600;
+
+  Visualizer visualizer(width, height);
   GraphicsPipeline graphics_pipeline;
 
+  auto cube = std::make_shared<Object>(cube_triangles, glm::vec3(5, 5, 20));
+  World world;
+  world.AddObject(cube);
+
+  cube->SetScale({4, 2, 2});
+
+  sf::Clock clock;
+
+  const auto delta_radians_per_second = glm::radians(720.0f);
+
   auto& window = visualizer.GetWindow();
-  glm::vec2 p1{0, 0}, p2{0, 100}, p3{100, 0};
-  glm::vec2 p4{0, 100}, p5{100, 0}, p6{100, 100};
-  std::vector<Triangle2D> triangles;
-  for (int i = 0; i < 1; i++) {
-    triangles.push_back(Triangle2D{p1, p2, p3, Color::RED});
-    triangles.push_back(Triangle2D{p4, p5, p6, Color::RED});
-  }
   while (window.isOpen()) {
-    const auto start = std::chrono::steady_clock::now();
     while (const std::optional event = window.pollEvent()) {
       if (event->is<sf::Event::Closed>()) {
         window.close();
@@ -31,9 +77,12 @@ void Application::Run() {
       }
     }
 
-    TurnTrianglesIntoPixels(800, 600, triangles);
-    const auto pixels = graphics_pipeline.Process({});
+    const auto delta_time = clock.getElapsedTime().asSeconds();
+    cube->SetRotation(
+        glm::rotate(cube->GetRotation(), delta_radians_per_second * delta_time, glm::vec3(1.0f, 1.0f, 0.0f)));
+
+    const auto pixels = graphics_pipeline.Process(world, width, height);
     visualizer.Visualize(pixels);
-    std::cout << "FPS: " << 1000000000. / (std::chrono::steady_clock::now() - start).count() << std::endl;
+    std::cout << "FPS: " << 1.f / clock.restart().asSeconds() << std::endl;
   }
 }

@@ -2,6 +2,7 @@
 
 #include "../common/geometry.h"
 #include "../common/object.h"
+#include "world.h"
 
 std::vector<Color> TurnTrianglesIntoPixels(uint32_t width, uint32_t height, const std::vector<Triangle2D>& triangles);
 
@@ -10,5 +11,5 @@ public:
   GraphicsPipeline() = default;
   ~GraphicsPipeline() = default;
 
-  std::vector<Color> Process(const std::vector<std::shared_ptr<Object>>& objects) const;
+  [[nodiscard]] std::vector<Color> Process(const World& world, const uint32_t width, const uint32_t height) const;
 };
