@@ -12,7 +12,7 @@ class Visualizer {
   ~Visualizer();
 
   sf::RenderWindow& GetWindow();
-  void Visualize(const std::vector<Triangle2D>& triangles);
+  void Visualize(const std::vector<Color>& pixels);
 
  private:
   sf::RenderWindow window_;

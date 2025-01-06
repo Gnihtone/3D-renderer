@@ -1,8 +1,6 @@
 #include "application.h"
 
 int main() {
-  Application app;
-  app.Run();
-
+  Application::Run();
   return 0;
 }
