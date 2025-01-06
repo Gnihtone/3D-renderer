@@ -61,8 +61,9 @@ void Application::Run() {
 
   sf::Clock clock;
 
-  const auto delta_radians_per_second = glm::radians(720.0f);
+  const auto delta_radians_per_second = glm::radians(60.0f);
 
+  auto delta_time = clock.getElapsedTime().asSeconds();
   auto& window = visualizer.GetWindow();
   while (window.isOpen()) {
     while (const std::optional event = window.pollEvent()) {
@@ -77,12 +78,13 @@ void Application::Run() {
       }
     }
 
-    const auto delta_time = clock.getElapsedTime().asSeconds();
     cube->SetRotation(
         glm::rotate(cube->GetRotation(), delta_radians_per_second * delta_time, glm::vec3(1.0f, 1.0f, 0.0f)));
 
     const auto pixels = graphics_pipeline.Process(world, width, height);
     visualizer.Visualize(pixels);
-    std::cout << "FPS: " << 1.f / clock.restart().asSeconds() << std::endl;
+    delta_time = clock.getElapsedTime().asSeconds();
+    clock.restart();
+    std::cout << "FPS: " << 1.0f / delta_time << std::endl;
   }
 }
