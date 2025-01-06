@@ -156,28 +156,32 @@ std::vector<Color> TurnTrianglesIntoPixels(const uint32_t width, const uint32_t 
 
     const auto max_y = std::min(GetMaxY(new_triangle) + 1, static_cast<float>(height));
 
+    int32_t current_min_x = 0;
+    int32_t current_max_x = width - 1;
+
     for (int y = std::max(top_most_point.y, 0.f); y < max_y; ++y) {
-      int32_t current_min_x = 0.f;
-      int32_t current_max_x = width;
-      // while (current_min_x > 0 && CheckPointIsInTriangle(new_triangle, current_min_x, y)) {
-      //   --current_min_x;
-      // }
+      current_min_x = std::max(0, current_min_x - 10);
+      current_max_x = std::min(static_cast<int32_t>(width) - 1, current_max_x + 10);
+
+      while (current_min_x > 0 && CheckPointIsInTriangle(new_triangle, current_min_x, y)) {
+        --current_min_x;
+      }
       while (current_min_x < width - 1 && !CheckPointIsInTriangle(new_triangle, current_min_x, y)) {
         ++current_min_x;
       }
-      // if (current_max_x < current_min_x) {
-      //   current_max_x = current_min_x;
-      // }
+      if (current_max_x < current_min_x) {
+        current_max_x = current_min_x;
+      }
 
-      // while (current_max_x < width - 1 && CheckPointIsInTriangle(new_triangle, current_max_x, y)) {
-      //   ++current_max_x;
-      // }
-      while (current_max_x > current_min_x && !CheckPointIsInTriangle(new_triangle, current_max_x, y)) {
+      while (current_max_x < width - 1 && CheckPointIsInTriangle(new_triangle, current_max_x, y)) {
+        ++current_max_x;
+      }
+      while (current_max_x > 0 && !CheckPointIsInTriangle(new_triangle, current_max_x, y)) {
         --current_max_x;
       }
-      // if (current_min_x > current_max_x) {
-      //   current_min_x = current_max_x;
-      // }
+      if (current_min_x > current_max_x) {
+        current_min_x = current_max_x;
+      }
 
       for (int x = current_min_x; x <= current_max_x; ++x) {
         auto z = GetZCoordinate(new_triangle, x, y);
