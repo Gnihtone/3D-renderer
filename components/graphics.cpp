@@ -50,8 +50,6 @@ void TransformTriangles(std::vector<Triangle3D>& triangles, const glm::vec3& sca
   transform_matrix = transform_matrix * tmp;
   transform_matrix = glm::scale(transform_matrix, scale);
 
-  // const auto ortho_matrix = glm::ortho(0.f, 800.0f, .0f, 600.0f, 0.1f, 100.0f);
-  // transform_matrix = ortho_matrix * transform_matrix;
   const auto perspective_matrix =
       glm::perspective(45.0f, static_cast<float>(width) / static_cast<float>(height), 0.1f, 100.f);
   transform_matrix = perspective_matrix * transform_matrix;

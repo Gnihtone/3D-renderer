@@ -30,5 +30,3 @@ struct Triangle2D {
   glm::vec2 points[3];
   Color color;
 };
-
-constexpr std::vector<glm::vec3> CUBE_TRIANGLES = {};
