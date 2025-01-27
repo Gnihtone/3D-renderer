@@ -8,6 +8,20 @@ endif ()
 set(CMAKE_CXX_STANDARD 23)
 set(Boost_INCLUDE_DIR $ENV{Boost_INCLUDE_DIR})
 
+add_executable(3D_renderer main.cpp
+        application.cpp
+        application.h
+        components/visualizer.cpp
+        components/visualizer.h
+        common/geometry.cpp
+        common/geometry.h
+        common/object.cpp
+        common/object.h
+        components/graphics.cpp
+        components/graphics.h
+        components/world.cpp
+        components/world.h)
+
 find_package(Boost 1.87 REQUIRED)
 target_link_libraries(3D_renderer PRIVATE ${Boost_LIBRARIES})
 include_directories(${Boost_INCLUDE_DIR})
