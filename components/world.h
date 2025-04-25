@@ -2,21 +2,38 @@
 
 #include <memory>
 
-#include "../common/object.h"
+#include "camera.h"
+#include "light.h"
+#include "object.h"
 
+namespace renderer {
 class World {
-public:
+ public:
   World() = default;
-  ~World() = default;
+  explicit World(std::vector<Object>&& objects);
 
-  explicit World(const std::vector<std::shared_ptr<Object>>& objects);
+  Object& AddObject(Object&& object);
+  Object RemoveObject(size_t object_id);
 
-  void AddObject(const std::shared_ptr<Object>& object);
-  void RemoveObject(const std::shared_ptr<Object>& object);
+  std::vector<Object>& GetObjects();
+  [[nodiscard]] const std::vector<Object>& GetObjects() const;
 
-  std::vector<std::shared_ptr<Object>>& GetObjects();
-  [[nodiscard]] const std::vector<std::shared_ptr<Object>>& GetObjects() const;
+  [[nodiscard]] const Object& GetObjectById(const ObjectId id) const;
 
-private:
-  std::vector<std::shared_ptr<Object>> objects_;
+  void AddCamera(Camera&& camera);
+  void ChangeActiveCamera(size_t index);
+
+  [[nodiscard]] const Camera& GetActiveCamera() const;
+  Camera& GetActiveCamera();
+
+  void AddLight(SomeLight&& light);
+  const std::vector<SomeLight>& GetLights() const;
+
+ private:
+  std::vector<Object> objects_;
+  std::vector<Camera> cameras_;
+  std::vector<SomeLight> lights_;
+
+  size_t active_camera_index = 0;
 };
+}  // namespace renderer

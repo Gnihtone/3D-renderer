@@ -5,35 +5,37 @@
 
 #include "../common/geometry.h"
 
-Visualizer::Visualizer()
-    : width_(800),
-      height_(600),
-      window_(sf::VideoMode({width_, height_}), "Window"),
-      texture_(sf::Texture({width_, height_})),
-      sprite_(texture_) {
-  window_.setVerticalSyncEnabled(false);
-  sprite_.setPosition({0, 0});
+namespace renderer {
+
+namespace {
+
+constexpr Width kDefaultWidth{800};
+constexpr Height kDefaultHeight{600};
+
+const uint8_t* ConvertPixels(const Color* pixels) {
+  return reinterpret_cast<const uint8_t*>(pixels);
 }
 
-Visualizer::~Visualizer() {
-  window_.close();
+}  // namespace
+
+Visualizer::Visualizer(sf::RenderWindow* render_window)
+    : window_(render_window), texture_(sf::Texture({kDefaultWidth, kDefaultHeight})), sprite_(texture_) {
+  window_->setMouseCursorVisible(false);
+  window_->setMouseCursorGrabbed(true);
 }
 
-sf::RenderWindow& Visualizer::GetWindow() {
-  return window_;
+void Visualizer::Visualize(const Picture& picture) {
+  const sf::Vector2u size{picture.GetWidth(), picture.GetHeight()};
+  if (texture_.getSize() != size) {
+    window_->setSize(size);
+    const auto is_resize_successful = texture_.resize(size);
+    assert(is_resize_successful);
+  }
+  texture_.update(ConvertPixels(picture.GetPixels()), size, {0, 0});
+
+  window_->clear(sf::Color::White);
+  window_->draw(sprite_);
+  window_->display();
 }
 
-void Visualizer::Visualize(const std::vector<Color>& pixels) {
-  texture_.update(reinterpret_cast<const uint8_t*>(pixels.data()), {width_, height_}, {0, 0});
-
-  window_.clear(sf::Color::White);
-  window_.draw(sprite_);
-  window_.display();
-}
-
-Visualizer::Visualizer(const uint32_t width, const uint32_t height)
-    : width_(width),
-      height_(height),
-      window_(sf::VideoMode({width, height}), "Window"),
-      texture_(sf::Texture({width, height})),
-      sprite_(texture_) {}
+}  // namespace renderer

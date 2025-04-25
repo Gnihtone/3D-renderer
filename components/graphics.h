@@ -1,15 +1,21 @@
 #pragma once
 
 #include "../common/geometry.h"
-#include "../common/object.h"
+#include "object.h"
 #include "world.h"
 
-std::vector<Color> TurnTrianglesIntoPixels(uint32_t width, uint32_t height, const std::vector<Triangle2D>& triangles);
+namespace renderer {
+class Picture;
 
 class GraphicsPipeline {
-public:
+ public:
   GraphicsPipeline() = default;
   ~GraphicsPipeline() = default;
 
-  [[nodiscard]] std::vector<Color> Process(const World& world, const uint32_t width, const uint32_t height) const;
+  void Process(const World& world, Picture* picture) const;
+
+ private:
+  std::vector<float> z_buffer_;
 };
+
+}  // namespace renderer

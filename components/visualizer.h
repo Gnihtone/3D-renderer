@@ -4,23 +4,20 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "../common/geometry.h"
+#include "../common/picture.h"
+
+namespace renderer {
 
 class Visualizer {
  public:
-  Visualizer();
-  ~Visualizer();
+  explicit Visualizer(sf::RenderWindow* render_window);
 
-  Visualizer(const uint32_t width, const uint32_t height);
-
-  sf::RenderWindow& GetWindow();
-  void Visualize(const std::vector<Color>& pixels);
+  void Visualize(const Picture& picture);
 
  private:
-  uint32_t width_;
-  uint32_t height_;
-
-  sf::RenderWindow window_;
+  sf::RenderWindow* window_;
   sf::Texture texture_;
   sf::Sprite sprite_;
 };
+
+}  // namespace renderer
