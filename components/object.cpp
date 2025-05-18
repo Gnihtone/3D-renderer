@@ -61,14 +61,13 @@ ObjectId Object::GetId() const {
   return id_;
 }
 
-Matrix4x4 Object::GetTransformationMatrix() const {
-  auto transform_matrix = Matrix4x4(1.0f);
-  const auto tmp = glm::mat4_cast(glm::normalize(transform_.GetRotation()));
-  transform_matrix = glm::translate(transform_matrix, transform_.GetPosition());
-  transform_matrix = transform_matrix * tmp;
-  transform_matrix = glm::scale(transform_matrix, transform_.GetScale());
+Matrix4x4 Object::GetModelMatrix() const {
+  auto model_matrix = Matrix4x4(1.0f);
+  model_matrix = glm::translate(model_matrix, transform_.GetPosition());
+  model_matrix = model_matrix * glm::mat4_cast(glm::normalize(transform_.GetRotation()));
+  model_matrix = glm::scale(model_matrix, transform_.GetScale());
 
-  return transform_matrix;
+  return model_matrix;
 }
 
 void Object::OnUpdate() {}

@@ -19,7 +19,7 @@ Transform& Camera::GetTransform() {
 Matrix4x4 Camera::GetViewMatrix() const {
   auto translate = Matrix4x4(1.0f);
   translate = glm::translate(translate, -transform_.GetPosition());
-  const auto rotate = glm::mat4_cast(glm::normalize(transform_.GetRotation()));
+  const auto rotate = glm::mat4_cast(glm::normalize(-transform_.GetRotation()));
 
   return rotate * translate;
 }

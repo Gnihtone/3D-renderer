@@ -54,11 +54,12 @@ void Application::Run() {
     world_.AddLight(DirectionalLight(Color(255, 255, 255, 255), Vector3(1, 0, 1)));
   }
 
-  auto& camera_ref = world_.GetActiveCamera();
-  auto& camera_transform = camera_ref.GetTransform();
-  auto& cube_ref = world_.AddObject(std::move(cube));
+  auto* camera_ref = &world_.GetActiveCamera();
+  auto* camera_transform = &camera_ref->GetTransform();
+  auto* cube_ref = &world_.AddObject(std::move(cube));
 
   Vector3 velocity{0};
+  float rot = 0.f;
 
   constexpr auto delta_radians_per_second = glm::radians(60.0f);
   constexpr auto delta_units_per_second = 10.0f;
@@ -69,8 +70,8 @@ void Application::Run() {
   sf::Vector2i prev_mouse_pos = sf::Mouse::getPosition();
   sf::Vector2i mouse_pos_change(0, 0);
 
-  auto on_event = [this, &need_to_rotate, &was_pressed, &velocity, &prev_mouse_pos,
-                   &mouse_pos_change](const sf::Event& event) {
+  auto on_event = [this, &need_to_rotate, &was_pressed, &velocity, &prev_mouse_pos, &mouse_pos_change, &rot,
+                   &camera_transform](const sf::Event& event) {
     if (event.is<sf::Event::Closed>()) {
       runtime_.Stop();
     } else if (event.is<sf::Event::KeyPressed>()) {
@@ -82,8 +83,9 @@ void Application::Run() {
       if (key == sf::Keyboard::Key::Escape) {
         runtime_.Stop();
       } else if (key == sf::Keyboard::Key::Space) {
-        need_to_rotate = !need_to_rotate;
-        velocity = Vector3{0};
+        Camera camera = world_.GetActiveCamera();
+        world_.AddCamera(std::move(camera));
+        camera_transform = &world_.GetActiveCamera().GetTransform();
       } else if (key == sf::Keyboard::Key::A) {
         velocity += Vector3{-1, 0, 0};
       } else if (key == sf::Keyboard::Key::D) {
@@ -96,6 +98,16 @@ void Application::Run() {
         velocity += Vector3{0, 1, 0};
       } else if (key == sf::Keyboard::Key::K) {
         velocity += Vector3{0, -1, 0};
+      } else if (key == sf::Keyboard::Key::Q) {
+        rot -= 1.f;
+      } else if (key == sf::Keyboard::Key::E) {
+        rot += 1.f;
+      } else if (key == sf::Keyboard::Key::Num0) {
+        world_.ChangeActiveCamera(0);
+        camera_transform = &world_.GetActiveCamera().GetTransform();
+      } else if (key == sf::Keyboard::Key::Num1) {
+        world_.ChangeActiveCamera(1);
+        camera_transform = &world_.GetActiveCamera().GetTransform();
       }
       was_pressed[static_cast<int>(key)] = true;
     } else if (event.is<sf::Event::KeyReleased>()) {
@@ -112,6 +124,10 @@ void Application::Run() {
         velocity -= Vector3{0, 1, 0};
       } else if (key == sf::Keyboard::Key::K) {
         velocity -= Vector3{0, -1, 0};
+      } else if (key == sf::Keyboard::Key::Q) {
+        rot += 1.f;
+      } else if (key == sf::Keyboard::Key::E) {
+        rot -= 1.f;
       }
       was_pressed[static_cast<int>(key)] = false;
     } else if (event.is<sf::Event::MouseMoved>()) {
@@ -122,23 +138,23 @@ void Application::Run() {
     }
   };
 
-  auto on_update = [this, &cube_ref, &camera_transform, &need_to_rotate, &velocity, &mouse_pos_change,
-                    &prev_mouse_pos](float delta_time) {
+  auto on_update = [this, &cube_ref, &camera_transform, &need_to_rotate, &velocity, &mouse_pos_change, &prev_mouse_pos,
+                    &rot](float delta_time) {
     if (need_to_rotate) {
-      auto& cube_transform = cube_ref.GetTransform();
+      auto& cube_transform = cube_ref->GetTransform();
       cube_transform.SetRotation(
           glm::rotate(cube_transform.GetRotation(), delta_radians_per_second * delta_time, Vector3(1.0f, 1.0f, 0.0f)));
     }
 
-    const auto curr_rot = glm::normalize(camera_transform.GetRotation());
+    const auto curr_rot = glm::normalize(camera_transform->GetRotation());
     auto forward = velocity * curr_rot;
     auto t = glm::length(velocity);
     std::cout << forward.x << ' ' << forward.y << ' ' << forward.z << std::endl;
-    camera_transform.SetPosition(camera_transform.GetPosition() + t * forward * delta_units_per_second * delta_time);
+    camera_transform->SetPosition(camera_transform->GetPosition() + t * forward * delta_units_per_second * delta_time);
 
-    if (mouse_pos_change.x != 0 || mouse_pos_change.y != 0) {
-      const auto axis = Vector3{-mouse_pos_change.y, -mouse_pos_change.x, 0} * curr_rot;
-      camera_transform.SetRotation(glm::rotate(curr_rot, delta_radians_per_second * delta_time, axis));
+    const auto axis = Vector3{-mouse_pos_change.y, -mouse_pos_change.x, rot} * curr_rot;
+    if (axis != Vector3{0, 0, 0}) {
+      camera_transform->SetRotation(glm::rotate(curr_rot, delta_radians_per_second * delta_time, axis));
       mouse_pos_change = {0, 0};
       prev_mouse_pos = {static_cast<int>(picture_.GetWidth() / 2), static_cast<int>(picture_.GetHeight() / 2)};
       sf::Mouse::setPosition(prev_mouse_pos, *runtime_.GetWindow());

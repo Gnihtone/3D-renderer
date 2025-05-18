@@ -40,7 +40,7 @@ class Object {
 
   [[nodiscard]] ObjectId GetId() const;
 
-  [[nodiscard]] Matrix4x4 GetTransformationMatrix() const;
+  [[nodiscard]] Matrix4x4 GetModelMatrix() const;
 
   virtual void OnUpdate();
 

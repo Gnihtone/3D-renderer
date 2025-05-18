@@ -1,54 +1,41 @@
 cmake_minimum_required(VERSION 3.30)
-project(3D_renderer)
+project(3D_renderer VERSION 0.1)
 
-add_subdirectory(deps/boost EXCLUDE_FROM_ALL)
-
-if (POLICY CMP0167)
-    cmake_policy(SET CMP0167 OLD)
-endif ()
-
-set(BOOST_ENABLE_CMAKE ON)
-
-#include(FetchContent)
-#FetchContent_Declare(
-#        Boost
-#        GIT_REPOSITORY https://github.com/boostorg/boost.git
-#        GIT_TAG boost-1.87.0
-#        GIT_SHALLOW TRUE
-#)
-#FetchContent_MakeAvailable(Boost)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-#set(Boost_INCLUDE_DIR $ENV{Boost_INCLUDE_DIR})
-
 add_executable(3D_renderer main.cpp
         application.cpp
         except.cpp
-        components/visualizer.cpp
         common/geometry.cpp
-        components/object.cpp
+        common/picture.cpp
+        common/transform.cpp
+        common/z_buffer.cpp
+        components/camera.cpp
         components/graphics.cpp
+        components/light.cpp
+        components/object.cpp
+        components/runtime.cpp
+        components/visualizer.cpp
         components/world.cpp
         generators/object_generator.cpp
-        components/camera.cpp
         objects/cube.cpp
-        common/picture.cpp
-        common/z_buffer.cpp
-        components/runtime.cpp
-        common/transform.cpp
-        components/light.cpp
 )
 
-#find_package(Boost 1.87 REQUIRED)
-#target_link_libraries(3D_renderer PRIVATE ${Boost_LIBRARIES})
-#include_directories(${Boost_INCLUDE_DIR})
+set(BUILD_SHARED_LIBS ON)
+add_subdirectory(deps/SFML EXCLUDE_FROM_ALL)
+target_link_libraries(3D_renderer PRIVATE sfml-window sfml-graphics)
 
-find_package(SFML 3 REQUIRED COMPONENTS Graphics Audio Network REQUIRED)
-target_link_libraries(3D_renderer PRIVATE SFML::System SFML::Graphics SFML::Audio SFML::Network)
-include_directories(${SFML_INCLUDE_DIR})
+add_subdirectory(deps/assimp EXCLUDE_FROM_ALL)
+target_link_libraries(3D_renderer PRIVATE assimp)
 
-find_package(glm REQUIRED)
-target_link_libraries(3D_renderer PRIVATE glm::glm)
-include_directories(${glm_INCLUDE_DIR})
+include_directories(${PROJECT_SOURCE_DIR}/deps/assimp/include)
+include_directories(${PROJECT_SOURCE_DIR}/deps/SFML/include)
+include_directories(${PROJECT_SOURCE_DIR}/deps/glm)
+
+add_custom_command(TARGET 3D_renderer PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${SFML_BINARY_DIR}/bin/ ${CMAKE_BINARY_DIR}/bin)

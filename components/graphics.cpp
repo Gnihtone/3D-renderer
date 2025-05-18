@@ -64,7 +64,7 @@ Vector3 FindLowestPoint(const Triangle3D& triangle) {
 }
 
 void TransformWorldTriangles(std::vector<Triangle3D>& triangles, const Object& object) {
-  auto transform_matrix = object.GetTransformationMatrix();
+  auto transform_matrix = object.GetModelMatrix();
 
   for (auto& [points, color] : triangles) {
     for (int i = 0; i < 3; ++i) {
