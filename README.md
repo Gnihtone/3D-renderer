@@ -17,8 +17,8 @@
 
 ## Сборка и запуск проекта
 
-1. `git clone --recurse-submodules https://github.com/Gnihtone/3D-renderer.git`
+1. `git clone https://github.com/Gnihtone/3D-renderer.git`
 
-2. `git branch dev`
+2. `git submodule update --init --recursive`
 
 3. `cmake .`
